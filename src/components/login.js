@@ -106,6 +106,7 @@ const Login = () => {
                 </Button>
               </Row>
             </Form>
+            <div className='mb-3 mt-3 text-center'>Not registered? <a href='/register'>Register</a></div>
           </Card>
         </Col>
       </Container>

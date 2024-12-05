@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Row, Button, Form, Container, Card, Col, Alert } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import { useNavigate } from 'react-router-dom'; 
+import { useAuth } from '../contexts/userContext';
 
 const Register = () => {
   const [alertMessage, setAlertMessage] = useState('');
-  const [alertVariant, setAlertVariant] = useState('success'); // success | danger
-  const navigate = useNavigate(); // Initialize navigate hook
+  const [alertVariant, setAlertVariant] = useState('success'); 
+  const navigate = useNavigate();
+  const { login } = useAuth(); 
 
   const validationSchema = Yup.object({
     name: Yup.string().required('* Required'),
@@ -28,25 +30,25 @@ const Register = () => {
       const userExists = existingUsers.find(user => user.email === values.email);
 
       if (userExists) {
-        // User already exists
+        
         setAlertMessage('User already exists!');
         setAlertVariant('danger');
         onSubmitProps.setSubmitting(false);
       } else {
-        // Store user data in localStorage
+        
         existingUsers.push(values);
         localStorage.setItem('users', JSON.stringify(existingUsers));
-
-        // Set success alert message
+       
         setAlertMessage('Registration successful!');
         setAlertVariant('success');
         onSubmitProps.setSubmitting(false);
         onSubmitProps.resetForm();
+        
+        login(values);
 
-        // Redirect to the login page after successful registration
         setTimeout(() => {
-          navigate('/login'); // Redirects to the login page
-        }, 1000); // Delay to show success message before redirecting
+          navigate('/login'); 
+        }, 1000); 
       }
     },
   });
@@ -126,6 +128,7 @@ const Register = () => {
                 </Button>
               </Row>
             </Form>
+            <div className='mb-3 mt-3 text-center'>Already registered? <a href='/login'>Log in</a></div>
           </Card>
         </Col>
       </Container>
