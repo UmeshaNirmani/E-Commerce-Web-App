@@ -11,6 +11,7 @@ const Products = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState(''); // New state for search query
   const itemsPerPage = 5;
 
   const fetchData = async () => {
@@ -65,17 +66,24 @@ const Products = () => {
   if (error) return <div>Error: {error}</div>;
 
   // Filtering
-  const categories = ['All', 'Frock', 'Trouser', 'Skirt', 'Blouse']
-  const filteredData =
-  selectedCategory === 'All'
+  const categories = ['All', 'Frock', 'Trouser', 'Skirt', 'Blouse'];
+
+  const filteredData = selectedCategory === 'All'
     ? data
     : data.filter((item) => item.category === selectedCategory);
+
+  // Search Filtering
+  const searchedData = filteredData.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const currentItems = searchedData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(searchedData.length / itemsPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -98,13 +106,15 @@ const Products = () => {
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
-          <Form inline>
+          <Form inline onSubmit={(e) => e.preventDefault()}>
             <Row>
               <Col xs="auto">
                 <Form.Control
                   type="text"
                   placeholder="Search"
-                  className=" mr-sm-2"
+                  className="mr-sm-2"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery on change
                 />
               </Col>
               <Col xs="auto">
@@ -121,7 +131,7 @@ const Products = () => {
         <h1 className="text-center">Our Products</h1>
       </Row>
 
-      <Navbar expand="lg" className="mb-5" style={{backgroundColor: '#ffffff'}}>
+      <Navbar expand="lg" className="mb-5" style={{ backgroundColor: '#ffffff' }}>
         <Container>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
@@ -132,7 +142,7 @@ const Products = () => {
                 id="basic-nav-dropdown"
                 onSelect={(category) => {
                   setSelectedCategory(category);
-                  setCurrentPage(1); 
+                  setCurrentPage(1);
                 }}
               >
                 {categories.map((category, index) => (
@@ -144,24 +154,24 @@ const Products = () => {
             </Nav>
           </Navbar.Collapse>
         </Container>
-      </Navbar> 
+      </Navbar>
 
       <Row>
-      {currentItems.map((request, index) => (
+        {currentItems.map((product, index) => (
           <Col key={index} md={4} className="mb-4">
-            {request && (
+            {product && (
               <Card>
                 <Card.Body>
-                  <Card.Img variant="top" src={request.image} />
-                  <Card.Title>{request.name}</Card.Title>
-                  <Card.Text>{request.description}</Card.Text>
-                  <Card.Title>{request.category}</Card.Title>
-                  <Card.Text>LKR {request.price}</Card.Text>
+                  <Card.Img variant="top" src={product.image} />
+                  <Card.Title>{product.name}</Card.Title>
+                  <Card.Text>{product.description}</Card.Text>
+                  <Card.Title>{product.category}</Card.Title>
+                  <Card.Text>LKR {product.price}</Card.Text>
                   <Row className="justify-content-center">
                     <Button
                       variant="primary"
                       style={{ width: '50%' }}
-                      onClick={() => addToCart(request)}
+                      onClick={() => addToCart(product)}
                     >
                       Add to Cart
                     </Button>
@@ -174,9 +184,10 @@ const Products = () => {
       </Row>
 
       <Pagination className="justify-content-center mt-4">
-        <Pagination.Prev 
-            onClick={() => handlePageChange(currentPage - 1)} 
-            disabled={currentPage === 1} />
+        <Pagination.Prev
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        />
         {Array.from({ length: totalPages }, (_, index) => (
           <Pagination.Item
             key={index + 1}
@@ -186,11 +197,11 @@ const Products = () => {
             {index + 1}
           </Pagination.Item>
         ))}
-      <Pagination.Next 
-          onClick={() => handlePageChange(currentPage + 1)} 
-          disabled={currentPage === totalPages} />
+        <Pagination.Next
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        />
       </Pagination>
-
     </Container>
   );
 };
