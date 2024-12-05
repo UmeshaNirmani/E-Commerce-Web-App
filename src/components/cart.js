@@ -1,10 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Button, Card, Container, Col, Row } from 'react-bootstrap';
+import { Button, Card, Container, Col, Row, Alert } from 'react-bootstrap';
+import { useAuth } from '../contexts/userContext'; 
 
 const Cart = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [cartItems, setCartItems] = useState([]);
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
 
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('cartItems')) || [];
@@ -34,14 +37,12 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
-    const isAuthenticated = !!localStorage.getItem('authenticatedUser');
-
-    if (!isAuthenticated) {
-      navigate('/login', { state: { from: '/checkout' } });
+    if (!currentUser) {
+      setShowLoginMessage(true);
     } else {
       setCartItems([]);
       localStorage.removeItem('cartItems');
-      navigate('/checkout');
+      navigate('/cart');
     }
   };
 
@@ -53,8 +54,16 @@ const Cart = () => {
   };
 
   return (
-    <Container fluid style={{ maxWidth: '600px', marginTop: '50px' , marginBottom: '50px'}}>
+    <Container fluid style={{ maxWidth: '600px', marginTop: '50px', marginBottom: '50px' }}>
       <h2 className="text-center mb-4">Shopping Cart</h2>
+
+      {/* Display login message if user is not logged in */}
+      {showLoginMessage && (
+        <Alert variant="danger" onClose={() => setShowLoginMessage(false)} dismissible>
+          Please log in to proceed to checkout.
+        </Alert>
+      )}
+
       {cartItems.length === 0 ? (
         <div className="text-center">
           <p>Your cart is empty.</p>
@@ -121,26 +130,26 @@ const Cart = () => {
           <div className="text-center mt-4">
             <h4>Subtotal: {parseFloat(calculateSubtotal()).toFixed(2)} LKR</h4>
             <Row>
-            <Col xs={6}>
-              <Button
-                variant="primary"
-                className="mt-3"
-                onClick={() => navigate('/')}
-                style={{ width: '100%' }}
-              >
-                Shop more
-              </Button>
+              <Col xs={6}>
+                <Button
+                  variant="primary"
+                  className="mt-3"
+                  onClick={() => navigate('/')}
+                  style={{ width: '100%' }}
+                >
+                  Shop more
+                </Button>
               </Col>
               <Col xs={6}>
-              <Button
-                variant="success"
-                className="mt-3"
-                onClick={handleCheckout}
-                style={{ width: '100%' }}
-              >
-                Checkout
-              </Button>
-            </Col>
+                <Button
+                  variant="success"
+                  className="mt-3"
+                  onClick={handleCheckout}
+                  style={{ width: '100%' }}
+                >
+                  Checkout
+                </Button>
+              </Col>
             </Row>
           </div>
         </>

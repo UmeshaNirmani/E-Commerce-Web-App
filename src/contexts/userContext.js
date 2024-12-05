@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
 
-
 const userAuthContext = createContext();
 
 export const useAuth = () => useContext(userAuthContext);
@@ -13,13 +12,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('authenticatedUser', JSON.stringify(user));
   };
 
-  const logout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('authenticatedUser');
-  };
-
   return (
-    <userAuthContext.Provider value={{ currentUser, login, logout }}>
+    <userAuthContext.Provider value={{ currentUser, login }}>
       {children}
     </userAuthContext.Provider>
   );
