@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { FiShoppingCart } from "react-icons/fi";
-import { Button } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 
 const Cart = (product) => {
 
@@ -33,11 +33,14 @@ const Cart = (product) => {
       ) : (
         <div>
           <ul>
+            <Card>
             {cartItems.map((item, index) => (
               <li key={index}>
-                {item.name} - {item.price}
+              <Card.Title> {item.name}</Card.Title>   
+              <Card.Subtitle className="mb-2">{item.price}</Card.Subtitle>
               </li>
             ))}
+            </Card>
           </ul>
           <Button onClick={handleCheckout}>Proceed to Checkout</Button>
         </div>

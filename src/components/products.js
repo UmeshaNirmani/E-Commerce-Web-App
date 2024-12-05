@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Container, Row, Col, Spinner, Navbar, Nav, Form, Badge } from 'react-bootstrap';
+import { Card, Button, Container, Row, Col, Spinner, Navbar, Nav, Form, Badge, NavDropdown, Pagination } from 'react-bootstrap';
 import { FiShoppingCart } from "react-icons/fi";
 import { IoSearchOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
@@ -10,6 +10,8 @@ const Products = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const fetchData = async () => {
     try {
@@ -29,7 +31,6 @@ const Products = () => {
   useEffect(() => {
     fetchData();
 
-    // Initialize cart count from localStorage
     const savedCart = JSON.parse(localStorage.getItem('cartItems')) || [];
     const initialCount = savedCart.reduce((acc, item) => acc + item.quantity, 0);
     setCartCount(initialCount);
@@ -51,7 +52,6 @@ const Products = () => {
       localStorage.setItem('cartItems', JSON.stringify(updatedCart));
     }
 
-    // Update cart count
     const newCount = existingCart.reduce((acc, item) => acc + item.quantity, 1);
     setCartCount(newCount);
   };
@@ -63,6 +63,15 @@ const Products = () => {
       </Row>
     );
   if (error) return <div>Error: {error}</div>;
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <Container>
@@ -99,11 +108,30 @@ const Products = () => {
           </Form>
         </Container>
       </Navbar>
+
       <Row className="mt-5 mb-3">
         <h1 className="text-center">Our Products</h1>
       </Row>
+
+      <Navbar expand="lg" className="mb-5" style={{backgroundColor: '#ffffff'}}>
+        <Container>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              <Navbar.Brand>Filter by:</Navbar.Brand>
+              <NavDropdown title="Category" id="basic-nav-dropdown">
+              <NavDropdown.Item href="#action/3.1">Frocks</NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.2">Trousers</NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.3">Skirts</NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.3">Blouses</NavDropdown.Item>
+            </NavDropdown>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar> 
+
       <Row>
-        {data.map((request, index) => (
+      {currentItems.map((request, index) => (
           <Col key={index} md={4} className="mb-4">
             {request && (
               <Card>
@@ -128,6 +156,25 @@ const Products = () => {
           </Col>
         ))}
       </Row>
+
+      <Pagination className="justify-content-center mt-4">
+        <Pagination.Prev 
+            onClick={() => handlePageChange(currentPage - 1)} 
+            disabled={currentPage === 1} />
+        {Array.from({ length: totalPages }, (_, index) => (
+          <Pagination.Item
+            key={index + 1}
+            active={index + 1 === currentPage}
+            onClick={() => handlePageChange(index + 1)}
+          >
+            {index + 1}
+          </Pagination.Item>
+        ))}
+      <Pagination.Next 
+          onClick={() => handlePageChange(currentPage + 1)} 
+          disabled={currentPage === totalPages} />
+      </Pagination>
+
     </Container>
   );
 };
