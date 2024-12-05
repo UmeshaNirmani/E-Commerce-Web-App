@@ -5,12 +5,12 @@ import { IoSearchOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 
 const Products = () => {
-  const [cart, setCart] = useState([]);
   const [cartCount, setCartCount] = useState(0);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const itemsPerPage = 5;
 
   const fetchData = async () => {
@@ -64,9 +64,17 @@ const Products = () => {
     );
   if (error) return <div>Error: {error}</div>;
 
+  // Filtering
+  const categories = ['All', 'Frock', 'Trouser', 'Skirt', 'Blouse']
+  const filteredData =
+  selectedCategory === 'All'
+    ? data
+    : data.filter((item) => item.category === selectedCategory);
+
+  // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
   const handlePageChange = (pageNumber) => {
@@ -118,13 +126,21 @@ const Products = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <Navbar.Brand>Filter by:</Navbar.Brand>
-              <NavDropdown title="Category" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Frocks</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">Trousers</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Skirts</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Blouses</NavDropdown.Item>
-            </NavDropdown>
+              <Navbar.Brand>Filter by category:</Navbar.Brand>
+              <NavDropdown
+                title={selectedCategory}
+                id="basic-nav-dropdown"
+                onSelect={(category) => {
+                  setSelectedCategory(category);
+                  setCurrentPage(1); 
+                }}
+              >
+                {categories.map((category, index) => (
+                  <NavDropdown.Item key={index} eventKey={category}>
+                    {category}
+                  </NavDropdown.Item>
+                ))}
+              </NavDropdown>
             </Nav>
           </Navbar.Collapse>
         </Container>
