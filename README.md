@@ -37,4 +37,4 @@ Ensure you have the following installed on your machine:
 
 ## Additional Implementation
 
-Implemented pagination in the products page.
+Implemented pagination in the products page and a loading spinner.
