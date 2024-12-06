@@ -14,6 +14,7 @@ const Products = () => {
   const [searchQuery, setSearchQuery] = useState(''); // New state for search query
   const itemsPerPage = 5;
 
+  // Fetch product data from a local JSON file
   const fetchData = async () => {
     try {
       const response = await fetch('/assets/data.json');
@@ -29,14 +30,15 @@ const Products = () => {
     }
   };
 
+  // Fetch data and initialize the cart count when the component loads
   useEffect(() => {
     fetchData();
-
     const savedCart = JSON.parse(localStorage.getItem('cartItems')) || [];
     const initialCount = savedCart.reduce((acc, item) => acc + item.quantity, 0);
     setCartCount(initialCount);
   }, []);
 
+  // Add a product to the cart
   const addToCart = (product) => {
     const existingCart = JSON.parse(localStorage.getItem('cartItems')) || [];
     const existingItem = existingCart.find((item) => item.id === product.id);

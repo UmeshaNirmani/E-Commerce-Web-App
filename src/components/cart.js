@@ -9,11 +9,13 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
 
+  // Load cart items from localStorage when the component mounts
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('cartItems')) || [];
     setCartItems(savedCart);
   }, []);
 
+  // Increase the quantity of a cart item
   const handleIncrease = (index) => {
     const updatedCart = [...cartItems];
     updatedCart[index].quantity += 1;
@@ -21,6 +23,7 @@ const Cart = () => {
     localStorage.setItem('cartItems', JSON.stringify(updatedCart));
   };
 
+  // Decrease the quantity of a cart item
   const handleDecrease = (index) => {
     const updatedCart = [...cartItems];
     if (updatedCart[index].quantity > 1) {
@@ -30,12 +33,14 @@ const Cart = () => {
     }
   };
 
+   // Remove an item from the cart
   const handleRemove = (index) => {
     const updatedCart = cartItems.filter((_, i) => i !== index);
     setCartItems(updatedCart);
     localStorage.setItem('cartItems', JSON.stringify(updatedCart));
   };
 
+  // Handle the checkout process
   const handleCheckout = () => {
     if (!currentUser) {
       setShowLoginMessage(true);

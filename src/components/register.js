@@ -25,6 +25,7 @@ const Register = () => {
     },
 
     validationSchema,
+    // Handle form submission
     onSubmit: (values, onSubmitProps) => {
       const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
       const userExists = existingUsers.find(user => user.email === values.email);
